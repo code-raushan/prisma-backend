@@ -34,7 +34,7 @@ exports.login = async (req, res, next)=>{
             throw new Error('Please provide email and password')
         }
         //find the user with the email 
-        const user = prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where:{
                 email
             }
@@ -44,11 +44,25 @@ exports.login = async (req, res, next)=>{
             throw new Error('User not found')
         }
         //password mismatch
-        if(user.password !== password){
+        if(user.password!==password){
             throw new Error('password is incorrect')
         }
         cookieToken(user, res)
 
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+//logout
+exports.logout = async(req, res, next)=>{
+    try {
+        res.clearCookie('token')
+        res.status(200).json(
+            {
+                success: true,
+                message: "user logged out"
+            }
+        )
     } catch (error) {
         throw new Error(error)
     }
