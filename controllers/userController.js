@@ -23,6 +23,33 @@ exports.signup = async(req, res, next)=>{
         cookieToken(user, res)
         
     } catch (error) {
-        
+        console.log(error.message);
+    }
+}
+//login user
+exports.login = async (req, res, next)=>{
+    try {
+        const {email, password}=req.body;
+        if(!email || !password){
+            throw new Error('Please provide email and password')
+        }
+        //find the user with the email 
+        const user = prisma.user.findUnique({
+            where:{
+                email
+            }
+        })
+        // if user doesn't exist
+        if(!user){
+            throw new Error('User not found')
+        }
+        //password mismatch
+        if(user.password !== password){
+            throw new Error('password is incorrect')
+        }
+        cookieToken(user, res)
+
+    } catch (error) {
+        throw new Error(error)
     }
 }
